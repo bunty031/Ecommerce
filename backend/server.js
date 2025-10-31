@@ -1,3 +1,4 @@
+const path = require("path");
 const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectDatabase = require("./config/database");
@@ -26,6 +27,20 @@ cloudinary.config({
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server is working on http://localhost:${process.env.PORT}`);
 });
+
+// ==========================
+// 🚀 Serve frontend on Render
+// ==========================
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "PRODUCTION") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
+  });
+}
+// ==========================
 
 // Unhandled Promise Rejection
 process.on("unhandledRejection", (err) => {
