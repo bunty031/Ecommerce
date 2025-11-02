@@ -122,3 +122,35 @@
     margin: 1vmax;
   }
 }
+.socialIcons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2vmax;
+}
+
+.linkedinSvgIcon {
+  color: #0a66c2;
+}
+
+.githubSvgIcon {
+  color: black;
+}
+
+.youtubeSvgIcon {
+  color: tomato;
+}
+
+.instagramSvgIcon {
+  color: rgb(144, 81, 202);
+}
+.socialIcons svg {
+  font-size: 4vmax;  /* Increase or decrease as you like */
+  transition: all 0.3s ease;
+}
+
+.socialIcons svg:hover {
+  transform: scale(1.2);
+}
+
+

@@ -14,7 +14,6 @@
   color: #1e1e1e;
 }
 
-
 .footer-section {
   flex: 1 1 250px;
   margin: 1vmax;
@@ -93,18 +92,69 @@
   transform: scale(1.15);
 }
 
-/* Responsive */
+/* ✅ Compact Responsive Footer */
 @media (max-width: 768px) {
   .footer {
     flex-direction: column;
     text-align: center;
+    padding: 1vmax 0.5vmax; /* much smaller padding */
   }
 
   .footer-section {
-    margin: 2vmax 0;
+    margin: 0.5vmax 0;
+    flex: none;
+  }
+
+  .footer-section.left h4,
+  .footer-section.right h4 {
+    font-size: 1.8vmin;
+  }
+
+  .footer-section.left p,
+  .footer-section.center p {
+    font-size: 1.6vmin;
   }
 
   .footer-section.center h1 {
-    font-size: 2.3vmax;
+    font-size: 3vmin;
+    margin-bottom: 0.4vmax;
+  }
+
+  .app-buttons img {
+    width: 5vmax;
+    margin: 0.3vmax;
+  }
+
+  .social-icons a {
+    font-size: 3vmin;
+    gap: 0.5vmax;
+  }
+}
+
+/* ✅ For very small phones */
+@media (max-width: 480px) {
+  .footer {
+    padding: 0.8vmax 0.5vmax;
+  }
+
+  .footer-section {
+    margin: 0.3vmax 0;
+  }
+
+  .footer-section.center h1 {
+    font-size: 2.5vmin;
+  }
+
+  .footer-section.left p,
+  .footer-section.center p {
+    font-size: 1.4vmin;
+  }
+
+  .app-buttons img {
+    width: 4vmax;
+  }
+
+  .social-icons a {
+    font-size: 2.5vmin;
   }
 }

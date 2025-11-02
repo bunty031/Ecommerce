@@ -5,18 +5,31 @@ const ApiFeatures = require("../utils/apifeatures");
 const cloudinary = require("cloudinary");
 
 // Create Product -- Admin
+// Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   let images = [];
 
+  // ✅ Ensure images always an array
   if (typeof req.body.images === "string") {
     images.push(req.body.images);
-  } else {
+  } else if (Array.isArray(req.body.images)) {
     images = req.body.images;
+  } else {
+    return next(new ErrorHander("Invalid image data format", 400));
+  }
+
+  // ✅ Validate before Cloudinary upload
+  if (!images.length) {
+    return next(new ErrorHander("Please upload at least one product image", 400));
   }
 
   const imagesLinks = [];
 
   for (let i = 0; i < images.length; i++) {
+    if (!images[i].startsWith("data:image")) {
+      return next(new ErrorHander("Invalid image format. Must be base64", 400));
+    }
+
     const result = await cloudinary.v2.uploader.upload(images[i], {
       folder: "products",
     });
@@ -30,6 +43,11 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   req.body.images = imagesLinks;
   req.body.user = req.user.id;
 
+  // ✅ Validation before DB insert
+  if (!req.body.name || !req.body.price || !req.body.description || !req.body.category) {
+    return next(new ErrorHander("All fields are required", 400));
+  }
+
   const product = await Product.create(req.body);
 
   res.status(201).json({
@@ -37,6 +55,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
     product,
   });
 });
+
 
 // Get All Product
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
