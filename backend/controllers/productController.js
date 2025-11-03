@@ -5,48 +5,53 @@ const ApiFeatures = require("../utils/apifeatures");
 const cloudinary = require("cloudinary");
 
 // Create Product -- Admin
-// Create Product -- Admin
+
+
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   let images = [];
 
-  // ✅ Ensure images always an array
+  // ✅ Handle images from both base64 and file uploads
   if (typeof req.body.images === "string") {
+    // Single image as base64
     images.push(req.body.images);
   } else if (Array.isArray(req.body.images)) {
+    // Multiple base64 images
     images = req.body.images;
-  } else {
-    return next(new ErrorHander("Invalid image data format", 400));
+  } else if (req.files && req.files.images) {
+    // Uploaded via express-fileupload
+    const imageFiles = Array.isArray(req.files.images)
+      ? req.files.images
+      : [req.files.images];
+    for (const file of imageFiles) {
+      const fileBase64 = `data:${file.mimetype};base64,${file.data.toString("base64")}`;
+      images.push(fileBase64);
+    }
   }
 
-  // ✅ Validate before Cloudinary upload
-  if (!images.length) {
-    return next(new ErrorHander("Please upload at least one product image", 400));
+  if (images.length === 0) {
+    return next(new ErrorHander("No image provided", 400));
   }
 
   const imagesLinks = [];
 
-  for (let i = 0; i < images.length; i++) {
-    if (!images[i].startsWith("data:image")) {
-      return next(new ErrorHander("Invalid image format. Must be base64", 400));
+  // ✅ Upload each image safely to Cloudinary
+  for (const image of images) {
+    try {
+      const result = await cloudinary.v2.uploader.upload(image, {
+        folder: "products",
+      });
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      return next(new ErrorHandler("Image upload failed", 500));
     }
-
-    const result = await cloudinary.v2.uploader.upload(images[i], {
-      folder: "products",
-    });
-
-    imagesLinks.push({
-      public_id: result.public_id,
-      url: result.secure_url,
-    });
   }
 
   req.body.images = imagesLinks;
   req.body.user = req.user.id;
-
-  // ✅ Validation before DB insert
-  if (!req.body.name || !req.body.price || !req.body.description || !req.body.category) {
-    return next(new ErrorHander("All fields are required", 400));
-  }
 
   const product = await Product.create(req.body);
 

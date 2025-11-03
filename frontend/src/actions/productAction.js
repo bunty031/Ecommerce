@@ -76,18 +76,19 @@ export const getAdminProduct = () => async (dispatch) => {
     });
   }
 };
+
+// Create Product
 // Create Product
 export const createProduct = (productData) => async (dispatch) => {
   try {
     dispatch({ type: NEW_PRODUCT_REQUEST });
 
-    // ✅ Use multipart/form-data for FormData
     const config = {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": "multipart/form-data" }, // ✅ FIXED HERE
     };
 
     const { data } = await axios.post(
-      "/api/v1/admin/product/new",
+      `/api/v1/admin/product/new`,
       productData,
       config
     );
@@ -99,11 +100,10 @@ export const createProduct = (productData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: NEW_PRODUCT_FAIL,
-      payload: error.response?.data?.message || "Something went wrong",
+      payload: error.response?.data?.message || error.message,
     });
   }
 };
-
 
 // Update Product
 export const updateProduct = (id, productData) => async (dispatch) => {

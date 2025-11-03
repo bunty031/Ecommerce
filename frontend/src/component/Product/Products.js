@@ -11,14 +11,11 @@ import Typography from "@material-ui/core/Typography";
 import MetaData from "../layout/MetaData";
 
 const categories = [
-  "Laptop",
-    "Footwear",
+  "Footwear",
     "Shirts",
-    "T-Shits",
+    "T-Shirts",
     "Pants",
-    "Books",
-    "Camera",
-    "SmartPhones",
+    "Hoodies",
     "Bags",
 ];
 

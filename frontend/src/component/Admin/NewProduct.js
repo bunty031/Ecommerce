@@ -28,14 +28,11 @@ const NewProduct = ({ history }) => {
   const [imagesPreview, setImagesPreview] = useState([]);
 
   const categories = [
-    "Laptop",
     "Footwear",
     "Shirts",
-    "T-Shits",
+    "T-Shirts",
     "Pants",
-    "Books",
-    "Camera",
-    "SmartPhones",
+    "Hoodies",
     "Bags",
   ];
 
@@ -52,42 +49,57 @@ const NewProduct = ({ history }) => {
     }
   }, [dispatch, alert, error, history, success]);
 
-  const createProductSubmitHandler = (e) => {
-    e.preventDefault();
+  // ✅ Handle form submission safely
+const createProductSubmitHandler = async (e) => {
+  e.preventDefault();
 
-    const myForm = new FormData();
+  if (images.length === 0) {
+    return alert.error("Please upload at least one product image.");
+  }
 
-    myForm.set("name", name);
-    myForm.set("price", price);
-    myForm.set("description", description);
-    myForm.set("category", category);
-    myForm.set("Stock", Stock);
+  const myForm = new FormData();
+  myForm.set("name", name);
+  myForm.set("price", price);
+  myForm.set("description", description);
+  myForm.set("category", category);
+  myForm.set("Stock", Stock);
 
-    images.forEach((image) => {
+  // ✅ Add each image as base64 string (after verifying it's valid)
+  images.forEach((image) => {
+    if (typeof image === "string" && image.startsWith("data:image")) {
       myForm.append("images", image);
-    });
-    dispatch(createProduct(myForm));
-  };
+    }
+  });
 
-  const createProductImagesChange = (e) => {
-    const files = Array.from(e.target.files);
+  dispatch(createProduct(myForm));
+};
 
-    setImages([]);
-    setImagesPreview([]);
+// ✅ Fix file upload handler
+const createProductImagesChange = async (e) => {
+  const files = Array.from(e.target.files);
+  setImages([]);
+  setImagesPreview([]);
 
-    files.forEach((file) => {
-      const reader = new FileReader();
+  for (const file of files) {
+    const reader = new FileReader();
 
+    const filePromise = new Promise((resolve) => {
       reader.onload = () => {
         if (reader.readyState === 2) {
-          setImagesPreview((old) => [...old, reader.result]);
-          setImages((old) => [...old, reader.result]);
+          const base64 = reader.result;
+          if (base64 && base64.startsWith("data:image")) {
+            setImagesPreview((old) => [...old, base64]);
+            setImages((old) => [...old, base64]);
+          }
+          resolve();
         }
       };
-
-      reader.readAsDataURL(file);
     });
-  };
+
+    reader.readAsDataURL(file);
+    await filePromise; // ✅ Wait for each image to finish reading
+  }
+};
 
   return (
     <Fragment>
