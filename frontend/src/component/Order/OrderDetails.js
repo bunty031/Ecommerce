@@ -7,6 +7,8 @@ import { Typography } from "@material-ui/core";
 import { getOrderDetails, clearErrors } from "../../actions/orderAction";
 import Loader from "../layout/Loader/Loader";
 import { useAlert } from "react-alert";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const OrderDetails = ({ match }) => {
   const { order, error, loading } = useSelector((state) => state.orderDetails);
@@ -19,9 +21,61 @@ const OrderDetails = ({ match }) => {
       alert.error(error);
       dispatch(clearErrors());
     }
-
     dispatch(getOrderDetails(match.params.id));
   }, [dispatch, alert, error, match.params.id]);
+
+  const generateBill = () => {
+    if (!order) return;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Order Invoice", 14, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Order ID: ${order._id}`, 14, 30);
+    doc.text(`Customer: ${order.user?.name || "N/A"}`, 14, 40);
+    doc.text(`Phone: ${order.shippingInfo?.phoneNo || "N/A"}`, 14, 50);
+    doc.text(
+      `Address: ${
+        order.shippingInfo
+          ? `${order.shippingInfo.address}, ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.pinCode}`
+          : "N/A"
+      }`,
+      14,
+      60
+    );
+    doc.text(`Payment ID: ${order.paymentInfo?.id || "N/A"}`, 14, 70);
+    doc.text(
+      `Payment Status: ${
+        order.paymentInfo?.status === "succeeded" ? "PAID" : "NOT PAID"
+      }`,
+      14,
+      80
+    );
+
+    const items = order.orderItems?.map((item) => [
+      item.name,
+      item.quantity,
+      `₹${item.price}`,
+      `₹${item.price * item.quantity}`,
+    ]);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [["Item", "Quantity", "Price", "Total"]],
+      body: items || [],
+    });
+
+    doc.text(
+      `Total Amount: ₹${order.totalPrice?.toFixed(2) || 0}`,
+      14,
+      doc.lastAutoTable.finalY + 10
+    );
+
+    doc.save(`Invoice_${order._id}.pdf`);
+  };
+
   return (
     <Fragment>
       {loading ? (
@@ -34,6 +88,7 @@ const OrderDetails = ({ match }) => {
               <Typography component="h1">
                 Order #{order && order._id}
               </Typography>
+
               <Typography>Shipping Info</Typography>
               <div className="orderDetailsContainerBox">
                 <div>
@@ -42,9 +97,7 @@ const OrderDetails = ({ match }) => {
                 </div>
                 <div>
                   <p>Phone:</p>
-                  <span>
-                    {order.shippingInfo && order.shippingInfo.phoneNo}
-                  </span>
+                  <span>{order.shippingInfo && order.shippingInfo.phoneNo}</span>
                 </div>
                 <div>
                   <p>Address:</p>
@@ -54,6 +107,7 @@ const OrderDetails = ({ match }) => {
                   </span>
                 </div>
               </div>
+
               <Typography>Payment</Typography>
               <div className="orderDetailsContainerBox">
                 <div>
@@ -72,9 +126,16 @@ const OrderDetails = ({ match }) => {
                   </p>
                 </div>
 
+                {order.paymentInfo && order.paymentInfo.id && (
+                  <div>
+                    <p>Payment ID:</p>
+                    <span>{order.paymentInfo.id}</span>
+                  </div>
+                )}
+
                 <div>
                   <p>Amount:</p>
-                  <span>{order.totalPrice && order.totalPrice}</span>
+                  <span>₹{order.totalPrice && order.totalPrice.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -111,6 +172,13 @@ const OrderDetails = ({ match }) => {
                     </div>
                   ))}
               </div>
+            </div>
+
+            {/* ✅ Download Button at the End */}
+            <div className="downloadInvoiceSection">
+              <button onClick={generateBill} className="downloadInvoiceBtn">
+                Download Invoice
+              </button>
             </div>
           </div>
         </Fragment>

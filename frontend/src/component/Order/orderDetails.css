@@ -2,12 +2,14 @@
   background-color: white;
 }
 
+/* Header */
 .orderDetailsContainer > h1 {
   font: 300 3vmax "Roboto";
   margin: 4vmax 0;
   color: tomato;
 }
 
+/* Main Container */
 .orderDetailsContainer {
   padding: 5vmax;
   padding-bottom: 0%;
@@ -17,6 +19,7 @@
   font: 400 1.8vmax "Roboto";
 }
 
+/* Info Boxes */
 .orderDetailsContainerBox,
 .orderDetailsCartItemsContainer {
   margin: 2vmax;
@@ -31,12 +34,14 @@
   font: 400 1vmax "Roboto";
   color: black;
 }
+
 .orderDetailsContainerBox > div > span {
   margin: 0 1vmax;
   font: 100 1vmax "Roboto";
   color: #575757;
 }
 
+/* Order Items Section */
 .orderDetailsCartItems > p {
   font: 400 1.8vmax "Roboto";
 }
@@ -69,6 +74,35 @@
   color: #5e5e5e;
 }
 
+/* ✅ Download Invoice Section */
+.downloadInvoiceSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3vmax;
+  margin-bottom: 3vmax;
+  padding-top: 2vmax;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.downloadInvoiceBtn {
+  background-color: tomato;
+  color: white;
+  padding: 1vmax 2.5vmax;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1vmax;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 99, 71, 0.3);
+}
+
+.downloadInvoiceBtn:hover {
+  background-color: rgb(220, 60, 40);
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
 @media screen and (max-width: 600px) {
   .orderDetailsContainer > p {
     font: 400 6vw "Roboto";
@@ -81,6 +115,7 @@
   .orderDetailsContainerBox > div > p {
     font: 400 4vw "Roboto";
   }
+
   .orderDetailsContainerBox > div > span {
     font: 100 4vw "Roboto";
   }
@@ -105,5 +140,16 @@
 
   .orderDetailsCartItemsContainer > div > span {
     font: 100 4vw "Roboto";
+  }
+
+  /* ✅ Mobile Styling for Download Button */
+  .downloadInvoiceSection {
+    margin-top: 6vw;
+    margin-bottom: 6vw;
+  }
+
+  .downloadInvoiceBtn {
+    font-size: 4vw;
+    padding: 2vw 6vw;
   }
 }

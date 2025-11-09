@@ -44,6 +44,7 @@ const UpdateProduct = ({ history, match }) => {
     "Pants",
     "Hoodies",
     "Bags",
+    "Other"
   ];
 
   const productId = match.params.id;

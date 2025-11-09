@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import MetaData from "../layout/MetaData";
 import { Link } from "react-router-dom";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
 import SideBar from "./Sidebar";
 import {
   getOrderDetails,
@@ -12,7 +12,6 @@ import { useSelector, useDispatch } from "react-redux";
 import Loader from "../layout/Loader/Loader";
 import { useAlert } from "react-alert";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
-import { Button } from "@material-ui/core";
 import { UPDATE_ORDER_RESET } from "../../constants/orderConstants";
 import "./processOrder.css";
 
@@ -22,17 +21,13 @@ const ProcessOrder = ({ history, match }) => {
 
   const updateOrderSubmitHandler = (e) => {
     e.preventDefault();
-
     const myForm = new FormData();
-
     myForm.set("status", status);
-
     dispatch(updateOrder(match.params.id, myForm));
   };
 
   const dispatch = useDispatch();
   const alert = useAlert();
-
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -67,6 +62,7 @@ const ProcessOrder = ({ history, match }) => {
                 display: order.orderStatus === "Delivered" ? "block" : "grid",
               }}
             >
+              {/* ---------------- LEFT SECTION ---------------- */}
               <div>
                 <div className="confirmshippingArea">
                   <Typography>Shipping Info</Typography>
@@ -90,6 +86,7 @@ const ProcessOrder = ({ history, match }) => {
                     </div>
                   </div>
 
+                  {/* ---------- PAYMENT SECTION ---------- */}
                   <Typography>Payment</Typography>
                   <div className="orderDetailsContainerBox">
                     <div>
@@ -108,9 +105,18 @@ const ProcessOrder = ({ history, match }) => {
                       </p>
                     </div>
 
+                    {/* ✅ Payment ID comes first */}
+                    {order.paymentInfo && order.paymentInfo.id && (
+                      <div>
+                        <p>Payment ID:</p>
+                        <span>{order.paymentInfo.id}</span>
+                      </div>
+                    )}
+
+                    {/* Then amount */}
                     <div>
                       <p>Amount:</p>
-                      <span>{order.totalPrice && order.totalPrice}</span>
+                      <span>₹{order.totalPrice && order.totalPrice}</span>
                     </div>
                   </div>
 
@@ -129,6 +135,8 @@ const ProcessOrder = ({ history, match }) => {
                     </div>
                   </div>
                 </div>
+
+                {/* ---------- CART ITEMS ---------- */}
                 <div className="confirmCartItems">
                   <Typography>Your Cart Items:</Typography>
                   <div className="confirmCartItemsContainer">
@@ -148,7 +156,8 @@ const ProcessOrder = ({ history, match }) => {
                   </div>
                 </div>
               </div>
-              {/*  */}
+
+              {/* ---------------- RIGHT SECTION ---------------- */}
               <div
                 style={{
                   display: order.orderStatus === "Delivered" ? "none" : "block",
@@ -167,7 +176,6 @@ const ProcessOrder = ({ history, match }) => {
                       {order.orderStatus === "Processing" && (
                         <option value="Shipped">Shipped</option>
                       )}
-
                       {order.orderStatus === "Shipped" && (
                         <option value="Delivered">Delivered</option>
                       )}
